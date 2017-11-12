@@ -1,0 +1,29 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "bamazon storefront app",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boslott/bamazon.git"
+  },
+  "keywords": [
+    "bamazon",
+    "storefront"
+  ],
+  "author": "Bo Slott",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boslott/bamazon/issues"
+  },
+  "homepage": "https://github.com/boslott/bamazon#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "inquirer": "^3.3.0",
+    "mysql": "^2.15.0",
+    "node-run-cmd": "^1.0.1"
+  }
+}
