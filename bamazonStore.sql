@@ -62,4 +62,6 @@ CREATE TABLE departments (
 );
 
 INSERT INTO departments (dpt_name)
-  VALUES ('Swimming', 'Hardware', 'Knick-Knacks');
+  VALUES ('Swimming'),
+         ('Hardware'),
+         ('Knick-Knacks');

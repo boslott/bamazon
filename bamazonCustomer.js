@@ -1,7 +1,6 @@
 
 
 const mysql = require('mysql');
-const colors = require('colors');
 const inquirer = require('inquirer');
 let connection = {};
 
@@ -13,14 +12,14 @@ function BamazonCustomerApp() {
 
 
 
+  //
+  // BamazonCustomerApp.prototype.working = () => {
+  //   console.log('current department = ' + this.currentDepartment);
+  // };
+  //
 
-  BamazonCustomerApp.prototype.working = () => {
-    console.log('current department = ' + this.currentDepartment);
-  };
 
-
-
-  BamazonCustomerApp.prototype.chooseDepartment = function() {
+  BamazonCustomerApp.prototype.chooseDepartment = () => {
     connection = mysql.createConnection({
       host: "localhost",
       port: 3306,
@@ -38,7 +37,6 @@ function BamazonCustomerApp() {
       }
     ]).then( function(answers) {
       connection.connect();
-
       connection.query('SELECT * FROM `products` WHERE `department_name` = ?',[answers.dept], (err, results) => {
         if (err) throw err;
         bam.displayItems(results);
@@ -58,22 +56,28 @@ function BamazonCustomerApp() {
       i < 9 ?
       console.log(items[i].item_id + '   $' + items[i].price + '    ' + items[i].product_name) :
       console.log(items[i].item_id + '  $' + items[i].price + '    ' + items[i].product_name);
-      // console.log(items[i].product_name + ' is out of stock');
     }
     console.log('');
-    bam.customerPurchaseItem(items);
+    bam.customerPurchaseItemCheck(items);
   };
 
-  BamazonCustomerApp.prototype.customerPurchaseItem = (items) => {
+  BamazonCustomerApp.prototype.customerPurchaseItemCheck = items => {
     inquirer.prompt([
       {
         type: 'input',
         message: 'What is the ID of the product you would like to buy?',
         name: 'productId'
       }
-    ]).then(answer => {
+    ]).then(answers => {
+      isNaN(answers.productId) ?
+        (console.log('That is not a number. Please try again:'), bam.customerPurchaseItemCheck(items)) : +answers.productId === 0 ?
+          (console.log('That is not a number. Please try again:'), bam.customerPurchaseItemCheck(items)) :
+            bam.customerPurchaseItem(answers, items);
+      });
+  }
 
-      let adjustedId = bam.adjustId(answer.productId);
+  BamazonCustomerApp.prototype.customerPurchaseItem = (answers, items) => {
+      let adjustedId = bam.adjustId(answers.productId);
       let parsedId = parseInt(adjustedId);
       console.log('');
 
@@ -81,7 +85,7 @@ function BamazonCustomerApp() {
         parsedId > 0 && parsedId < 31 ?
           items[parsedId-1].stock_quantity > 0 ?
 
-          (console.log(''), console.log('There are ' + items[parsedId - 1].stock_quantity + ' units left of ' + items[parsedId -1].product_name + '\'s in stock'), console.log(''), bam.customerPurchaseQuan(items, parsedId)) :
+          (console.log(''), console.log('There are ' + items[parsedId - 1].stock_quantity + ' units left of ' + items[parsedId -1].product_name + '\'s in stock'), console.log(''), bam.customerPurchaseQuanCheck(items, parsedId)) :
 
           (console.log('That item is out of stock :('), bam.customerPurchaseItem(items)) :
 
@@ -90,8 +94,8 @@ function BamazonCustomerApp() {
       (console.log('That is not a number. Please try again: '), bam.customerPurchaseItem(items));
 
 
-    });
-  };
+    };
+
 
   BamazonCustomerApp.prototype.adjustId = id => {
     let newId = 0;
@@ -102,7 +106,7 @@ function BamazonCustomerApp() {
     return newId;
   };
 
-  BamazonCustomerApp.prototype.customerPurchaseQuan = (items, item_id) => {
+  BamazonCustomerApp.prototype.customerPurchaseQuanCheck = (items, item_id) => {
 
     inquirer.prompt([
       {
@@ -111,6 +115,15 @@ function BamazonCustomerApp() {
         name: 'productQuan'
       }
     ]).then(answers => {
+       isNaN(answers.productQuan) ?
+        (console.log('That is not a number. Please try again:'), bam.customerPurchaseQuanCheck(items, item_id)) : +answers.productQuan === 0 ?
+          (console.log('That is not a number. Please try again:'), bam.customerPurchaseQuanCheck(items, item_id)) :
+            bam.customerPurchaseQuan(items, item_id, answers);
+      });
+    };
+
+  BamazonCustomerApp.prototype.customerPurchaseQuan = (items, item_id, answers) => {
+
       let parsedQuan = parseInt(answers.productQuan);
 
       parsedQuan <= items[item_id-1].stock_quantity ?
@@ -122,9 +135,9 @@ function BamazonCustomerApp() {
         console.log('The quantity of ' + items[item_id-1].product_name + '\'s in stock is now: ' + (items[item_id-1].stock_quantity - parsedQuan)),
         bam.updateDB(items[item_id-1].product_name, (items[item_id-1].stock_quantity - parsedQuan))) :
 
-      (console.log('There are not that many items in stock'), bam.customerPurchaseQuan(items, item_id));
-    });
+      (console.log('There are not that many items in stock'), bam.customerPurchaseQuan(items, item_id, answers));
   };
+
 
   BamazonCustomerApp.prototype.updateDB = (productName, newProductQuan) => {
 
@@ -152,8 +165,13 @@ function BamazonCustomerApp() {
         name: 'shopAgain'
       }
     ]).then(answers => {
+      let bamApp = {};
       answers.shopAgain ? (connection.end(), bam.chooseDepartment()) :
-        (connection.end(), console.log('Thank you for shoppping with Bamazon! \nHave a great day!'));
+        (connection.end(),
+        console.log(''),
+        console.log(''),
+        console.log('Thank you for shoppping with Bamazon! \nHave a great day!'),
+        console.log(''));
     });
   };
 
