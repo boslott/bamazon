@@ -49,12 +49,19 @@ function BamazonApp() {
           app.runManagerApp();
           break;
         case 'Exit The App':
-          process.exit();
+          app.exit();
           break;
         default:
           break;
       };
     });
+  };
+
+  BamazonApp.prototype.exit = () => {
+    console.log('');
+    console.log('Thank you! Have A Great Day!');
+    console.log('');
+    process.exit();
   };
 
   BamazonApp.prototype.runCustomerApp = () => {
