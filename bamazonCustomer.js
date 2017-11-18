@@ -58,14 +58,29 @@ function BamazonCustomerApp() {
       console.log(items[i].item_id + '  $' + items[i].price + '    ' + items[i].product_name);
     }
     console.log('');
-    bam.customerPurchaseItemCheck(items);
+    bam.chooseAltDept(items);
+  };
+
+  BamazonCustomerApp.prototype.chooseAltDept = (items) => {
+    inquirer.prompt([
+      {
+        type: 'list',
+        message: 'Please choose an option: ',
+        choices: ['Purchase An Item From This Department', 'Choose Another Department'],
+        name: 'altOpt'
+      }
+    ]).then( answers => {
+      answers.altOpt === 'Purchase An Item From This Department' ?
+        bam.customerPurchaseItemCheck(items) :
+        bam.chooseDepartment();
+    });
   };
 
   BamazonCustomerApp.prototype.customerPurchaseItemCheck = items => {
     inquirer.prompt([
       {
         type: 'input',
-        message: 'What is the ID of the product you would like to buy?',
+        message: 'What is the ID Number of the product you would like to buy?',
         name: 'productId'
       }
     ]).then(answers => {
@@ -171,7 +186,8 @@ function BamazonCustomerApp() {
         console.log(''),
         console.log(''),
         console.log('Thank you for shoppping with Bamazon! \nHave a great day!'),
-        console.log(''));
+        console.log(''),
+        process.exit());
     });
   };
 
